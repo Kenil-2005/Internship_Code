@@ -1,0 +1,133 @@
+.container {
+    margin-inline: 150px;
+    margin-block: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.card-section {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.card-wrapper {
+    flex: 1 0 350px;
+    max-width: 590px;
+    padding: 25px;
+    margin-inline: auto;
+    border: 1.5px solid black;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .2);
+}
+
+.card-wrapper p {
+    margin-block: 0px;
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.data-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12 px;
+}
+
+.data-title {
+    display: inline-block;
+    width: 150px;
+}
+
+.counter-wrapper {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.counter-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.count-content {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #333333;
+}
+
+.counter-btn,
+.btn-demo-content {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1px solid #000000;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: red;
+    background-color: yellow;
+}
+
+.btn:hover {
+    background-color: red;
+    color: yellow;
+}
+
+.dec-btn {
+    background-color: #ffeded;
+    color: #cc0000;
+}
+
+.dec-btn:hover {
+    background-color: #cc0000;
+    color: #ffffff;
+}
+
+.inc-btn {
+    background-color: #ededff;
+    color: #0000cc;
+}
+
+.inc-btn:hover {
+    background-color: #0000cc;
+    color: #ffffff;
+}
+
+.btn-demo-content {
+    display: flex;
+    gap: 15px;
+    margin-block: 50px;
+}
+
+.input-output-content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    max-width: 450px;
+}
+
+.input-field {
+    padding: 5px 8px;
+    outline: none;
+    width: 450px;
+}

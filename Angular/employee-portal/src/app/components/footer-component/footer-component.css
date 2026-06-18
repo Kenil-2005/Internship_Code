@@ -1,0 +1,12 @@
+.footer-wrapper {
+    padding-inline: 16px;
+    background-color: rgb(28, 96, 183);
+    color: white;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: 5px;
+}

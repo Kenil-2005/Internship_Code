@@ -1,0 +1,84 @@
+<div class="main-wrapper">
+    <div class="main-content container">
+        <section class="card-section">
+            @for (item of EmployeeData; track item.id){
+            <div class="card-wrapper">
+                <div class="card-content">
+                    <div class="data-wrapper">
+                        <p class="data">
+                            <strong class="data-title">Eid: </strong>
+                            <span class="data-body">{{item.id}}</span>
+                        </p>
+                        <p class="data">
+                            <strong class="data-title">Name: </strong>
+                            <span class="data-body">{{item.name}}</span>
+                        </p>
+                        <p class="data">
+                            <strong class="data-title">Deparment: </strong>
+                            <span class="data-body">{{item.department}}</span>
+                        </p>
+                        <p class="data">
+                            <strong class="data-title">Designation: </strong>
+                            <span class="data-body">{{item.designation}}</span>
+                        </p>
+                        <p class="data">
+                            <strong class="data-title">Salary: </strong>
+                            <span class="data-body"><span>&#8377;</span>{{item.salary}}</span>
+                        </p>
+                    </div>
+                    <div class="profile-pic-wrapper">
+                        <div class="profile-pic-content">
+                            <img src="{{item.image}}" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }@empty {
+            <p class="data">No items found!</p>
+            }
+        </section>
+
+        <div class="counter-wrapper">
+            <div class="counter-content">
+                <p class="count-content">
+                    {{count}}
+                </p>
+                <div class="counter-btn">
+                    <button class="dec-btn btn" (click)="Decrease()">Decrease</button>
+                    <button class="inc-btn btn" (click)="Increase()">Increase</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-demo-wrapper">
+            <div class="btn-demo-content">
+                <div class="promote-btn-wrap">
+                    <button class="promote-btn btn" (click)="Promote()">Promote Employee</button>
+                </div>
+                <div class="email-btn-wrap">
+                    <button class="email-btn btn" (click)="SendEmail()">Send Email</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-output-wrapper">
+            <div class="input-output-content">
+                <input type="text" class="input-field" [(ngModel)]="InputName" placeholder="Enter Your Name">
+                <p class="show-text">Employee Name: {{InputName}}</p>
+            </div>
+        </div>
+        <div class="input-output-wrapper">
+            <div class="input-output-content">
+                <input type="search" class="input-field" [(ngModel)]="SearchInput" placeholder="Enter Your Name">
+                <p class="show-text">Search: {{SearchInput}}</p>
+            </div>
+        </div>
+        <div class="input-output-wrapper">
+            <div class="input-output-content">
+                <textarea type="text" class="input-field" rows="5" [(ngModel)]="TextAreaName"
+                    placeholder="Enter Your Name"></textarea>
+                <p class="show-text">Textarea Data: {{TextAreaName}}</p>
+            </div>
+        </div>
+    </div>
+</div>

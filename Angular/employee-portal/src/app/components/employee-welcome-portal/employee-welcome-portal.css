@@ -1,0 +1,36 @@
+.container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    background-color: black;
+    color: white;
+}
+
+.main-heading {
+    font-size: 2rem;
+}
+
+.section {
+    width: 750px;
+    border: 1.5px solid white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-block: 15px;
+}
+
+.section-heading-wrap {
+    font-weight: bolder;
+    font-size: 1.4rem;
+    padding-block-end: 15px;
+}
+
+.data-title {
+    font-weight: 600;
+}
+
+.data {
+    margin-block-start: 0px;
+    margin-block-end: 10px;
+    font-size: 1.1rem;
+}

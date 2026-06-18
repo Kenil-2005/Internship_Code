@@ -1,0 +1,13 @@
+.navbar-wrapper {
+    background-color: rgb(28, 96, 183);
+    padding-inline: 16px;
+    color: white;
+    min-height: 70px;
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: 5px;
+}

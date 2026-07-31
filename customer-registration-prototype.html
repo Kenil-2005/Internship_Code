@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Registration &amp; Management — Training Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F1F3F7;
+    --surface:#FFFFFF;
+    --surface-sunken:#F7F8FA;
+    --border:#E1E4EA;
+    --border-strong:#C7CCD6;
+    --ink:#171B23;
+    --ink-muted:#5B6472;
+    --ink-faint:#8A93A3;
+    --primary:#24304A;
+    --primary-strong:#141B2B;
+    --accent:#DA8A2B;
+    --accent-ink:#5A3B0C;
+    --accent-bg:#FBEBD3;
+    --success:#1F8A5F;
+    --success-bg:#E4F5EC;
+    --danger:#C4432B;
+    --danger-bg:#FBEAE5;
+    --redline:#B4472E;
+    --redline-bg:#FFF3EE;
+    --radius:10px;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --shadow-sm:0 1px 2px rgba(20,27,43,0.06);
+    --shadow-md:0 8px 24px rgba(20,27,43,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  /* ---------- Layout shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns:248px 1fr;
+    min-height:100vh;
+  }
+  .sidebar{
+    background:var(--primary);
+    color:#fff;
+    padding:24px 16px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .brand{
+    padding:0 8px;
+  }
+  .brand-mark{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .brand-title{
+    font-family:var(--font-display);
+    font-size:17px;
+    font-weight:600;
+    line-height:1.3;
+    color:#fff;
+  }
+  .brand-sub{
+    margin-top:6px;
+    font-size:12px;
+    color:#AEB6C7;
+    line-height:1.5;
+  }
+  .nav{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    margin-top:4px;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:13.5px;
+    font-weight:500;
+    color:#C7CEDC;
+    cursor:pointer;
+    border:none;
+    background:transparent;
+    text-align:left;
+    width:100%;
+    font-family:var(--font-body);
+    transition:background .15s ease, color .15s ease;
+  }
+  .nav-item:hover{ background:rgba(255,255,255,0.06); color:#fff; }
+  .nav-item.active{ background:rgba(255,255,255,0.10); color:#fff; }
+  .nav-item .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:#4C5975; flex-shrink:0;
+  }
+  .nav-item.active .dot{ background:var(--accent); }
+  .nav-foot{
+    margin-top:auto;
+    padding:12px;
+    border-top:1px solid rgba(255,255,255,0.10);
+    font-size:11px;
+    color:#8792A8;
+    line-height:1.6;
+  }
+
+  .main{
+    padding:28px 40px 80px;
+    max-width:1160px;
+  }
+  .view{ display:none; animation:fade .25s ease; }
+  .view.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  .topbar{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:26px;
+  }
+  .view-eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+  }
+  .view-title{
+    font-family:var(--font-display);
+    font-size:26px;
+    font-weight:600;
+    margin:0;
+  }
+  .view-desc{
+    color:var(--ink-muted);
+    font-size:14px;
+    margin-top:8px;
+    max-width:640px;
+    line-height:1.55;
+  }
+
+  .redline-toggle{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:6px 8px 6px 14px;
+    box-shadow:var(--shadow-sm);
+    flex-shrink:0;
+  }
+  .redline-toggle span{ font-size:12.5px; font-weight:500; color:var(--ink-muted); }
+  .switch{
+    width:36px;height:20px;border-radius:999px;background:var(--border-strong);
+    position:relative; cursor:pointer; border:none; padding:0; flex-shrink:0;
+    transition:background .15s ease;
+  }
+  .switch::after{
+    content:"";
+    position:absolute; top:2px; left:2px;
+    width:16px; height:16px; border-radius:50%;
+    background:#fff; box-shadow:var(--shadow-sm);
+    transition:transform .15s ease;
+  }
+  .switch.on{ background:var(--redline); }
+  .switch.on::after{ transform:translateX(16px); }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+  }
+  .card-pad{ padding:24px; }
+
+  /* ---------- Spec annotation (redline) ---------- */
+  .field{ position:relative; margin-bottom:20px; }
+  .field.redline-on{ outline:1.5px dashed var(--redline); outline-offset:6px; border-radius:8px; }
+  .spec-tag{
+    display:none;
+    position:absolute;
+    top:-10px; right:-10px;
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--redline);
+    color:#fff;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:var(--shadow-sm);
+    z-index:2;
+  }
+  .field.redline-on .spec-tag{ display:flex; }
+  .spec-note{
+    display:none;
+    margin-top:8px;
+    background:var(--redline-bg);
+    border:1px solid #F0C9BB;
+    color:var(--accent-ink);
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    line-height:1.6;
+    padding:9px 11px;
+    border-radius:7px;
+  }
+  .field.redline-on.note-open .spec-note{ display:block; }
+
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:6px;
+    color:var(--ink);
+  }
+  label .req{ color:var(--danger); margin-left:2px; }
+  label .new-badge{
+    display:inline-block;
+    margin-left:8px;
+    font-family:var(--font-mono);
+    font-size:9.5px;
+    letter-spacing:.06em;
+    background:var(--accent-bg);
+    color:var(--accent-ink);
+    border-radius:4px;
+    padding:2px 6px;
+    vertical-align:middle;
+    text-transform:uppercase;
+  }
+  input[type=text], input[type=email], input[type=password], input[type=date], select, textarea{
+    width:100%;
+    font-family:var(--font-body);
+    font-size:14px;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid var(--border-strong);
+    background:var(--surface-sunken);
+    color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:2px solid var(--primary);
+    outline-offset:1px;
+    background:#fff;
+  }
+  input.invalid, select.invalid{ border-color:var(--danger); background:var(--danger-bg); }
+  .help{ font-size:12px; color:var(--ink-faint); margin-top:5px; }
+  .error{ font-size:12px; color:var(--danger); margin-top:5px; display:none; font-weight:500; }
+  .error.show{ display:block; }
+
+  .radio-row{ display:flex; gap:18px; padding:6px 0 2px; }
+  .radio-opt{ display:flex; align-items:center; gap:7px; font-size:14px; }
+  .radio-opt input{ width:auto; accent-color:var(--primary); }
+
+  .form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 20px;
+  }
+  .span-2{ grid-column:1 / -1; }
+
+  .btn{
+    font-family:var(--font-body);
+    font-size:13.5px;
+    font-weight:600;
+    border-radius:8px;
+    padding:10px 18px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{ transform:scale(0.98); }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-strong); }
+  .btn-ghost{ background:transparent; color:var(--ink-muted); border-color:var(--border-strong); }
+  .btn-ghost:hover{ background:var(--surface-sunken); }
+  .btn-danger{ background:var(--danger); color:#fff; }
+  .btn-danger:hover{ opacity:.9; }
+  .btn-sm{ padding:6px 12px; font-size:12.5px; border-radius:7px; }
+  .btn-row{ display:flex; gap:10px; margin-top:8px; }
+
+  /* ---------- Table ---------- */
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  thead th{
+    text-align:left;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+    background:var(--surface-sunken);
+  }
+  tbody td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+    color:var(--ink);
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--surface-sunken); }
+  .pill{
+    display:inline-block; padding:3px 9px; border-radius:999px;
+    font-size:11px; font-weight:600; font-family:var(--font-mono);
+  }
+  .pill-m{ background:#E5EEFF; color:#28457A; }
+  .pill-f{ background:#FDE7F1; color:#8A2B5E; }
+  .pill-o{ background:#EDE7FD; color:#5334A8; }
+  .method{
+    font-family:var(--font-mono); font-size:11px; font-weight:600;
+    padding:3px 8px; border-radius:5px; color:#fff; display:inline-block; min-width:52px; text-align:center;
+  }
+  .m-post{ background:#1F8A5F; }
+  .m-get{ background:#2569C8; }
+  .m-put{ background:#C6841C; }
+  .m-delete{ background:#C4432B; }
+  code{ font-family:var(--font-mono); font-size:12.5px; background:var(--surface-sunken); padding:2px 6px; border-radius:5px; }
+
+  .actions-cell{ display:flex; gap:8px; }
+  .icon-btn{
+    border:1px solid var(--border-strong); background:#fff; border-radius:7px;
+    padding:5px 10px; font-size:12px; cursor:pointer; font-weight:600; color:var(--ink-muted);
+  }
+  .icon-btn:hover{ background:var(--surface-sunken); }
+  .icon-btn.danger:hover{ background:var(--danger-bg); color:var(--danger); border-color:#EFC1B4; }
+
+  .empty-state{
+    text-align:center; padding:48px 20px; color:var(--ink-faint);
+  }
+  .empty-state .glyph{ font-family:var(--font-display); font-size:30px; color:var(--border-strong); margin-bottom:10px; }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; bottom:24px; right:24px;
+    background:var(--ink); color:#fff;
+    padding:13px 18px; border-radius:9px;
+    font-size:13.5px; font-weight:500;
+    box-shadow:var(--shadow-md);
+    display:flex; align-items:center; gap:10px;
+    transform:translateY(16px); opacity:0;
+    pointer-events:none;
+    transition:transform .2s ease, opacity .2s ease;
+    z-index:50;
+  }
+  .toast.show{ transform:translateY(0); opacity:1; }
+  .toast.success{ background:var(--success); }
+  .toast.error{ background:var(--danger); }
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(20,27,43,0.45);
+    display:none; align-items:center; justify-content:center; z-index:60;
+  }
+  .modal-backdrop.show{ display:flex; }
+  .modal{
+    background:#fff; border-radius:12px; padding:24px; width:360px;
+    box-shadow:var(--shadow-md);
+  }
+  .modal h3{ font-family:var(--font-display); font-size:17px; margin:0 0 8px; }
+  .modal p{ font-size:13.5px; color:var(--ink-muted); line-height:1.5; margin:0 0 20px; }
+
+  /* ---------- API / schema tables card header ---------- */
+  .section-label{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-faint); padding:16px 20px 0;
+  }
+  .table-wrap{ overflow-x:auto; }
+
+  .badge-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .badge{
+    font-family:var(--font-mono); font-size:11px; padding:4px 10px; border-radius:999px;
+    background:var(--surface-sunken); border:1px solid var(--border); color:var(--ink-muted);
+  }
+
+  .checklist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .checklist li{
+    display:flex; gap:10px; align-items:flex-start; font-size:13.5px; color:var(--ink); line-height:1.5;
+  }
+  .checklist li::before{
+    content:"✓"; color:var(--success); font-weight:700; flex-shrink:0;
+    background:var(--success-bg); width:18px; height:18px; border-radius:5px;
+    display:flex; align-items:center; justify-content:center; font-size:11px; margin-top:1px;
+  }
+
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:900px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ position:relative; height:auto; }
+    .form-grid, .two-col{ grid-template-columns:1fr; }
+    .main{ padding:20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">Training Exercise</div>
+      <div class="brand-title">Customer Registration &amp; Management</div>
+      <div class="brand-sub">ASP.NET Core Web API · Angular · SQL Server</div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="overview"><span class="dot"></span>Overview</button>
+      <button class="nav-item" data-view="form"><span class="dot"></span>Registration Form</button>
+      <button class="nav-item" data-view="list"><span class="dot"></span>Customer List</button>
+      <button class="nav-item" data-view="api"><span class="dot"></span>API Reference</button>
+      <button class="nav-item" data-view="schema"><span class="dot"></span>Database Schema</button>
+      <button class="nav-item" data-view="acceptance"><span class="dot"></span>Acceptance Criteria</button>
+    </nav>
+    <div class="nav-foot">
+      Prepared for trainee developers<br>
+      Rev. July 31, 2026 — v2
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section class="view active" id="view-overview">
+      <div class="topbar">
+        <div>
+          <div class="view-eyebrow">01 · Objective</div>
+          <h1 class="view-title">Build the full CRUD flow, end to end</h1>
+          <p class="view-desc">An Angular form and list view, an ASP.NET Core Web API, and a SQL Server table. This prototype is a clickable reference for what the finished screens should do — it is not the real app, and it holds no server or database. Use the toggle in each screen to reveal the exact spec line behind a field.</p>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card card-pad">
+          <div class="view-eyebrow" style="margin-bottom:12px;">In scope</div>
+          <ul class="checklist">
+            <li>One reactive form, reused for Create and Edit</li>
+            <li>Customer list with per-row Edit and Delete</li>
+            <li>Client-side validation on all nine fields</li>
+            <li>Create, list, update, delete API endpoints</li>
+            <li>One SQL Server table (EF Core, code-first)</li>
+            <li>Success / error message after every action</li>
+            <li>Confirmation prompt before delete</li>
+          </ul>
+        </div>
+        <div class="card card-pad">
+          <div class="view-eyebrow" style="margin-bottom:12px;">Out of scope</div>
+          <ul class="checklist">
+            <li style="opacity:.55;">Unit tests, SonarQube scan, formal PR review</li>
+          </ul>
+          <div class="badge-row" style="margin-top:22px;">
+            <span class="badge">ASP.NET Core Web API</span>
+            <span class="badge">Angular Reactive Forms</span>
+            <span class="badge">SQL Server + EF Core</span>
+            <span class="badge">9 form fields</span>
+          </div>
+          <p class="view-desc" style="margin-top:18px;">Goal is hands-on CRUD practice — keep the implementation simple and functional, not production-grade.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORM -->
+    <section class="view" id="view-form">
+      <div class="topbar">
+        <div>
+          <div class="view-eyebrow">02 · Angular · Reactive Form</div>
+          <h1 class="view-title" id="form-heading">Register a customer</h1>
+          <p class="view-desc">Shared between Create and Edit. Try submitting empty, or with bad values — validation runs live, matching the rules in the spec.</p>
+        </div>
+        <div class="redline-toggle">
+          <span>Spec annotations</span>
+          <button class="switch" id="redlineSwitch"></button>
+        </div>
+      </div>
+
+      <div class="card card-pad">
+        <form id="customerForm" novalidate>
+          <div class="form-grid">
+
+            <div class="field span-2" data-spec="Alphabetic characters and spaces only; 3–100 characters.">
+              <span class="spec-tag">1</span>
+              <label>Customer Name<span class="req">*</span></label>
+              <input type="text" id="f-name" placeholder="Jordan Casey" autocomplete="off">
+              <div class="help">Letters and spaces only, 3–100 characters.</div>
+              <div class="error" id="e-name">Enter a valid name (letters/spaces, 3–100 characters).</div>
+              <div class="spec-note">Field 1 · Customer Name — Text input · Required · Alphabetic characters and spaces only; 3–100 characters</div>
+            </div>
+
+            <div class="field" data-spec="Valid email format; must be unique in the database.">
+              <span class="spec-tag">2</span>
+              <label>Email Address<span class="req">*</span></label>
+              <input type="email" id="f-email" placeholder="jordan@example.com" autocomplete="off">
+              <div class="help">Must be a valid, unique email.</div>
+              <div class="error" id="e-email">Enter a valid email address.</div>
+              <div class="spec-note">Field 2 · Email Address — Text input · Required · Valid email format; must be unique in the database</div>
+            </div>
+
+            <div class="field" data-spec="Exactly 10 digits, numeric only.">
+              <span class="spec-tag">3</span>
+              <label>Mobile Number<span class="req">*</span></label>
+              <input type="text" id="f-mobile" placeholder="9876543210" maxlength="10" autocomplete="off">
+              <div class="help">Exactly 10 digits, numeric only.</div>
+              <div class="error" id="e-mobile">Enter exactly 10 digits.</div>
+              <div class="spec-note">Field 3 · Mobile Number — Text input · Required · Exactly 10 digits, numeric only</div>
+            </div>
+
+            <div class="field" data-spec="Valid past date; customer must be 18 or older.">
+              <span class="spec-tag">4</span>
+              <label>Date of Birth<span class="req">*</span></label>
+              <input type="date" id="f-dob">
+              <div class="help">Must be a past date; customer must be 18+.</div>
+              <div class="error" id="e-dob">Customer must be a real, past date and 18 years or older.</div>
+              <div class="spec-note">Field 4 · Date of Birth — Date picker · Required · Valid past date; customer must be 18 or older</div>
+            </div>
+
+            <div class="field" data-spec="Must select exactly one of: Male, Female, Other.">
+              <span class="spec-tag">5</span>
+              <label>Gender<span class="req">*</span></label>
+              <div class="radio-row">
+                <label class="radio-opt"><input type="radio" name="gender" value="Male"> Male</label>
+                <label class="radio-opt"><input type="radio" name="gender" value="Female"> Female</label>
+                <label class="radio-opt"><input type="radio" name="gender" value="Other"> Other</label>
+              </div>
+              <div class="error" id="e-gender">Select one option.</div>
+              <div class="spec-note">Field 5 · Gender — Radio group (Male / Female / Other) · Required · Must select exactly one</div>
+            </div>
+
+            <div class="field" data-spec="Must be selected from a predefined country list.">
+              <span class="spec-tag">6</span>
+              <label>Country<span class="req">*</span> <span class="new-badge">New</span></label>
+              <select id="f-country">
+                <option value="">Select a country</option>
+                <option>India</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>Canada</option>
+                <option>Australia</option>
+              </select>
+              <div class="error" id="e-country">Select a country.</div>
+              <div class="spec-note">Field 6 · Country — Dropdown · Required · Must be selected from a predefined country list</div>
+            </div>
+
+            <div class="field" data-spec="Must be selected from the states/provinces list for the chosen country.">
+              <span class="spec-tag">7</span>
+              <label>State<span class="req">*</span> <span class="new-badge">New</span></label>
+              <select id="f-state" disabled>
+                <option value="">Select a country first</option>
+              </select>
+              <div class="error" id="e-state">Select a state.</div>
+              <div class="spec-note">Field 7 · State — Dropdown, dependent on Country · Required · Options come from a static lookup keyed by Country</div>
+            </div>
+
+            <div class="field span-2" data-spec="Maximum 250 characters.">
+              <span class="spec-tag">8</span>
+              <label>Address<span class="req">*</span></label>
+              <textarea id="f-address" rows="2" maxlength="250" placeholder="Street, city, postal code"></textarea>
+              <div class="help">Maximum 250 characters.</div>
+              <div class="error" id="e-address">Address is required (max 250 characters).</div>
+              <div class="spec-note">Field 8 · Address — Text input · Required · Maximum 250 characters</div>
+            </div>
+
+            <div class="field span-2" data-spec="Minimum 8 characters; at least 1 letter and 1 number. Stored as a hash, never plain text.">
+              <span class="spec-tag">9</span>
+              <label>Password<span class="req">*</span></label>
+              <input type="password" id="f-password" placeholder="Minimum 8 characters" autocomplete="new-password">
+              <div class="help">Min 8 characters, at least 1 letter and 1 number. On edit, leave blank to keep the current password.</div>
+              <div class="error" id="e-password">Minimum 8 characters, with at least 1 letter and 1 number.</div>
+              <div class="spec-note">Field 9 · Password — Password input · Required on create · Min 8 chars, ≥1 letter, ≥1 number · Hashed server-side (e.g. Identity hasher / BCrypt) · Unchanged on update unless resupplied</div>
+            </div>
+
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary" id="submitBtn">Register customer</button>
+            <button type="button" class="btn btn-ghost" id="cancelEditBtn" style="display:none;">Cancel edit</button>
+            <button type="button" class="btn btn-ghost" id="resetBtn">Clear form</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- LIST -->
+    <section class="view" id="view-list">
+      <div class="topbar">
+        <div>
+          <div class="view-eyebrow">03 · Angular · GET /api/customers</div>
+          <h1 class="view-title">Registered customers</h1>
+          <p class="view-desc">Renders in a table. Edit pre-fills the reactive form via <code>GET /api/customers/{id}</code>. Delete confirms first, then calls the delete endpoint and refreshes this list.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Email</th><th>Mobile</th><th>DOB</th><th>Gender</th><th>Country / State</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customerRows"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <div class="glyph">—</div>
+          No customers yet. Register one from the Registration Form tab.
+        </div>
+      </div>
+    </section>
+
+    <!-- API -->
+    <section class="view" id="view-api">
+      <div class="topbar">
+        <div>
+          <div class="view-eyebrow">04 · ASP.NET Core Web API</div>
+          <h1 class="view-title">Endpoints</h1>
+          <p class="view-desc">One controller. Validate with data annotations, hash the password before saving, and return the right status codes for not-found records on GET/PUT/DELETE by id.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><span class="method m-post">POST</span></td><td><code>/api/customers/register</code></td><td>Registers a new customer after validation and password hashing</td></tr>
+              <tr><td><span class="method m-get">GET</span></td><td><code>/api/customers</code></td><td>Returns the list of registered customers</td></tr>
+              <tr><td><span class="method m-get">GET</span></td><td><code>/api/customers/{id}</code></td><td>Returns a single customer by id (used to pre-fill the Edit form)</td></tr>
+              <tr><td><span class="method m-put">PUT</span></td><td><code>/api/customers/{id}</code></td><td>Updates an existing customer's details</td></tr>
+              <tr><td><span class="method m-delete">DELETE</span></td><td><code>/api/customers/{id}</code></td><td>Deletes a customer by id</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCHEMA -->
+    <section class="view" id="view-schema">
+      <div class="topbar">
+        <div>
+          <div class="view-eyebrow">05 · SQL Server · EF Core (code-first)</div>
+          <h1 class="view-title">Customers table</h1>
+          <p class="view-desc">Generate this from your entity class. Columns marked New were added in this revision.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Column</th><th>Data type</th><th>Constraints</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td><code>CustomerId</code></td><td>INT</td><td>PK, Identity</td><td>Auto-incrementing primary key</td></tr>
+              <tr><td><code>FullName</code></td><td>NVARCHAR(100)</td><td>NOT NULL</td><td>—</td></tr>
+              <tr><td><code>Email</code></td><td>NVARCHAR(150)</td><td>NOT NULL, UNIQUE</td><td>Used as the login identifier</td></tr>
+              <tr><td><code>MobileNumber</code></td><td>VARCHAR(10)</td><td>NOT NULL</td><td>—</td></tr>
+              <tr><td><code>DateOfBirth</code></td><td>DATE</td><td>NOT NULL</td><td>—</td></tr>
+              <tr><td><code>Gender</code></td><td>NVARCHAR(10)</td><td>NOT NULL</td><td><span class="new-badge">New</span> stores Male / Female / Other</td></tr>
+              <tr><td><code>Country</code></td><td>NVARCHAR(100)</td><td>NOT NULL</td><td><span class="new-badge">New</span></td></tr>
+              <tr><td><code>State</code></td><td>NVARCHAR(100)</td><td>NOT NULL</td><td><span class="new-badge">New</span></td></tr>
+              <tr><td><code>Address</code></td><td>NVARCHAR(250)</td><td>NOT NULL</td><td>—</td></tr>
+              <tr><td><code>PasswordHash</code></td><td>NVARCHAR(MAX)</td><td>NOT NULL</td><td>Store a hash only — never plain text</td></tr>
+              <tr><td><code>CreatedDate</code></td><td>DATETIME</td><td>Default GETDATE()</td><td>Record creation timestamp</td></tr>
+              <tr><td><code>ModifiedDate</code></td><td>DATETIME</td><td>NULL</td><td><span class="new-badge">New</span> set on update</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCEPTANCE -->
+    <section class="view" id="view-acceptance">
+      <div class="topbar">
+        <div>
+          <div class="view-eyebrow">06 · Definition of done</div>
+          <h1 class="view-title">Acceptance criteria</h1>
+          <p class="view-desc">Your implementation is done when every item below is true against your own build — this prototype only mimics the front-end behavior described in each line.</p>
+        </div>
+      </div>
+      <div class="card card-pad">
+        <ul class="checklist">
+          <li>Submitting the form with valid data creates a row in the Customers table, including Gender, Country, and State</li>
+          <li>Required fields, email format, and the new Gender/Country/State selections are validated before submission</li>
+          <li>The password is stored as a hash, not plain text, and is left unchanged on update unless a new one is provided</li>
+          <li>The customer list displays all registered customers and updates after any create, edit, or delete action</li>
+          <li>Editing a customer pre-fills the form and updates the correct row in the Customers table</li>
+          <li>Deleting a customer prompts for confirmation, then removes the row from the Customers table and the list</li>
+          <li>A success or error message is shown to the user after each create, update, and delete action</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-backdrop" id="confirmBackdrop">
+  <div class="modal">
+    <h3>Delete this customer?</h3>
+    <p id="confirmText">This removes the record from the Customers table. This action can't be undone.</p>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="confirmDeleteBtn">Delete customer</button>
+      <button class="btn btn-ghost" id="cancelDeleteBtn">Keep customer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  // ---------- Nav ----------
+  var navItems = document.querySelectorAll('.nav-item');
+  var views = document.querySelectorAll('.view');
+  navItems.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      navItems.forEach(function(b){ b.classList.remove('active'); });
+      views.forEach(function(v){ v.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    });
+  });
+
+  // ---------- Redline / spec annotation toggle ----------
+  var redlineSwitch = document.getElementById('redlineSwitch');
+  var fields = document.querySelectorAll('.field');
+  var redlineOn = false;
+  redlineSwitch.addEventListener('click', function(){
+    redlineOn = !redlineOn;
+    redlineSwitch.classList.toggle('on', redlineOn);
+    fields.forEach(function(f){ f.classList.toggle('redline-on', redlineOn); });
+  });
+  fields.forEach(function(f){
+    var tag = f.querySelector('.spec-tag');
+    if(tag){
+      tag.addEventListener('click', function(){ f.classList.toggle('note-open'); });
+    }
+  });
+
+  // ---------- Country / State lookup ----------
+  var stateLookup = {
+    'India': ['Maharashtra','Karnataka','Delhi','Tamil Nadu','Gujarat'],
+    'United States': ['California','Texas','New York','Florida','Illinois'],
+    'United Kingdom': ['England','Scotland','Wales','Northern Ireland'],
+    'Canada': ['Ontario','Quebec','British Columbia','Alberta'],
+    'Australia': ['New South Wales','Victoria','Queensland','Western Australia']
+  };
+  var countrySel = document.getElementById('f-country');
+  var stateSel = document.getElementById('f-state');
+  countrySel.addEventListener('change', function(){
+    var list = stateLookup[countrySel.value];
+    stateSel.innerHTML = '';
+    if(!list){
+      stateSel.disabled = true;
+      stateSel.innerHTML = '<option value="">Select a country first</option>';
+      return;
+    }
+    stateSel.disabled = false;
+    stateSel.innerHTML = '<option value="">Select a state</option>' +
+      list.map(function(s){ return '<option>'+s+'</option>'; }).join('');
+  });
+
+  // ---------- Data ----------
+  var customers = [];
+  var nextId = 1;
+  var editingId = null;
+
+  function calcAge(dobStr){
+    var dob = new Date(dobStr);
+    var diff = Date.now() - dob.getTime();
+    return Math.floor(diff / (1000*60*60*24*365.25));
+  }
+
+  // ---------- Validation ----------
+  function setError(id, show){
+    document.getElementById('e-'+id).classList.toggle('show', show);
+    var input = document.getElementById('f-'+id);
+    if(input) input.classList.toggle('invalid', show);
+  }
+
+  function validate(){
+    var ok = true;
+
+    var name = document.getElementById('f-name').value.trim();
+    var nameOk = /^[A-Za-z ]{3,100}$/.test(name);
+    setError('name', !nameOk); if(!nameOk) ok = false;
+
+    var email = document.getElementById('f-email').value.trim();
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if(emailOk && editingId === null){
+      var dup = customers.some(function(c){ return c.email.toLowerCase() === email.toLowerCase(); });
+      if(dup) emailOk = false;
+    }
+    setError('email', !emailOk); if(!emailOk) ok = false;
+
+    var mobile = document.getElementById('f-mobile').value.trim();
+    var mobileOk = /^[0-9]{10}$/.test(mobile);
+    setError('mobile', !mobileOk); if(!mobileOk) ok = false;
+
+    var dob = document.getElementById('f-dob').value;
+    var dobOk = !!dob && new Date(dob) < new Date() && calcAge(dob) >= 18;
+    setError('dob', !dobOk); if(!dobOk) ok = false;
+
+    var genderEl = document.querySelector('input[name=gender]:checked');
+    var genderOk = !!genderEl;
+    setError('gender', !genderOk); if(!genderOk) ok = false;
+
+    var country = countrySel.value;
+    var countryOk = !!country;
+    setError('country', !countryOk); if(!countryOk) ok = false;
+
+    var state = stateSel.value;
+    var stateOk = !!state;
+    setError('state', !stateOk); if(!stateOk) ok = false;
+
+    var address = document.getElementById('f-address').value.trim();
+    var addressOk = address.length > 0 && address.length <= 250;
+    setError('address', !addressOk); if(!addressOk) ok = false;
+
+    var password = document.getElementById('f-password').value;
+    var passwordOk;
+    if(editingId !== null && password === ''){
+      passwordOk = true; // unchanged on update
+    } else {
+      passwordOk = password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
+    }
+    setError('password', !passwordOk); if(!passwordOk) ok = false;
+
+    return ok ? {
+      name: name, email: email, mobile: mobile, dob: dob,
+      gender: genderEl.value, country: country, state: state,
+      address: address, password: password
+    } : null;
+  }
+
+  // ---------- Toast ----------
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg, type){
+    clearTimeout(toastTimer);
+    toast.textContent = msg;
+    toast.className = 'toast show ' + (type || '');
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2600);
+  }
+
+  // ---------- Render list ----------
+  var rowsEl = document.getElementById('customerRows');
+  var emptyEl = document.getElementById('emptyState');
+  var genderPill = { Male:'pill-m', Female:'pill-f', Other:'pill-o' };
+
+  function render(){
+    rowsEl.innerHTML = '';
+    emptyEl.style.display = customers.length ? 'none' : 'block';
+    customers.forEach(function(c){
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>'+escapeHtml(c.name)+'</td>'+
+        '<td>'+escapeHtml(c.email)+'</td>'+
+        '<td>'+escapeHtml(c.mobile)+'</td>'+
+        '<td>'+escapeHtml(c.dob)+'</td>'+
+        '<td><span class="pill '+(genderPill[c.gender]||'')+'">'+escapeHtml(c.gender)+'</span></td>'+
+        '<td>'+escapeHtml(c.country)+' / '+escapeHtml(c.state)+'</td>'+
+        '<td class="actions-cell">'+
+          '<button class="icon-btn" data-edit="'+c.id+'">Edit</button>'+
+          '<button class="icon-btn danger" data-delete="'+c.id+'">Delete</button>'+
+        '</td>';
+      rowsEl.appendChild(tr);
+    });
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+
+  // ---------- Form submit ----------
+  var form = document.getElementById('customerForm');
+  var submitBtn = document.getElementById('submitBtn');
+  var cancelEditBtn = document.getElementById('cancelEditBtn');
+  var formHeading = document.getElementById('form-heading');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var data = validate();
+    if(!data){
+      showToast('Fix the highlighted fields before submitting.', 'error');
+      return;
+    }
+    if(editingId !== null){
+      var c = customers.find(function(x){ return x.id === editingId; });
+      Object.assign(c, data);
+      if(!data.password) { /* keep existing hash */ }
+      showToast('Customer updated.', 'success');
+      exitEditMode();
+    } else {
+      customers.push(Object.assign({ id: nextId++ }, data));
+      showToast('Customer registered.', 'success');
+      form.reset();
+      stateSel.innerHTML = '<option value="">Select a country first</option>';
+      stateSel.disabled = true;
+    }
+    render();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    form.reset();
+    ['name','email','mobile','dob','gender','country','state','address','password'].forEach(function(id){ setError(id, false); });
+    stateSel.innerHTML = '<option value="">Select a country first</option>';
+    stateSel.disabled = true;
+    if(editingId !== null) exitEditMode();
+  });
+
+  function exitEditMode(){
+    editingId = null;
+    formHeading.textContent = 'Register a customer';
+    submitBtn.textContent = 'Register customer';
+    cancelEditBtn.style.display = 'none';
+    form.reset();
+    stateSel.innerHTML = '<option value="">Select a country first</option>';
+    stateSel.disabled = true;
+  }
+  cancelEditBtn.addEventListener('click', exitEditMode);
+
+  // ---------- Edit / Delete (event delegation) ----------
+  var pendingDeleteId = null;
+  var confirmBackdrop = document.getElementById('confirmBackdrop');
+  var confirmText = document.getElementById('confirmText');
+
+  rowsEl.addEventListener('click', function(e){
+    var editId = e.target.getAttribute('data-edit');
+    var delId = e.target.getAttribute('data-delete');
+    if(editId){
+      var c = customers.find(function(x){ return x.id === Number(editId); });
+      if(!c) return;
+      editingId = c.id;
+      document.getElementById('f-name').value = c.name;
+      document.getElementById('f-email').value = c.email;
+      document.getElementById('f-mobile').value = c.mobile;
+      document.getElementById('f-dob').value = c.dob;
+      document.querySelector('input[name=gender][value="'+c.gender+'"]').checked = true;
+      countrySel.value = c.country;
+      countrySel.dispatchEvent(new Event('change'));
+      stateSel.value = c.state;
+      document.getElementById('f-address').value = c.address;
+      document.getElementById('f-password').value = '';
+      formHeading.textContent = 'Edit customer — ' + c.name;
+      submitBtn.textContent = 'Save changes';
+      cancelEditBtn.style.display = 'inline-block';
+      document.querySelector('[data-view="form"]').click();
+    }
+    if(delId){
+      pendingDeleteId = Number(delId);
+      var target = customers.find(function(x){ return x.id === pendingDeleteId; });
+      confirmText.textContent = 'This removes ' + (target ? target.name : 'this customer') + ' from the Customers table. This action can\'t be undone.';
+      confirmBackdrop.classList.add('show');
+    }
+  });
+
+  document.getElementById('cancelDeleteBtn').addEventListener('click', function(){
+    pendingDeleteId = null;
+    confirmBackdrop.classList.remove('show');
+  });
+  document.getElementById('confirmDeleteBtn').addEventListener('click', function(){
+    if(pendingDeleteId !== null){
+      customers = customers.filter(function(c){ return c.id !== pendingDeleteId; });
+      if(editingId === pendingDeleteId) exitEditMode();
+      render();
+      showToast('Customer deleted.', 'success');
+    }
+    pendingDeleteId = null;
+    confirmBackdrop.classList.remove('show');
+  });
+
+  // ---------- Seed with one example row ----------
+  customers.push({ id: nextId++, name:'Amit Sharma', email:'amit.sharma@example.com', mobile:'9876543210', dob:'1994-03-12', gender:'Male', country:'India', state:'Maharashtra', address:'12 MG Road, Pune', password:'••••••••' });
+  render();
+})();
+</script>
+</body>
+</html>
